@@ -13,13 +13,12 @@
 struct Logger {
     Logger() = default;
     virtual ~Logger() = default;
-    virtual void log_transfer(long from, long to, double amount) = 0;
+    virtual const void log_transfer(const long from, const long to, const double amount) = 0;
 };
 
 struct ConsoleLogger : Logger{
-    // TODO dtor?
     ConsoleLogger(const char* name) : name{name} {}
-    void log_transfer(long from, long to, double amount) override{
+    const void log_transfer(const long from, const long to, const double amount) override{
         printf("[%s] %ld -> %ld: %f\n", name, from, to, amount);
     }
     protected:
@@ -28,30 +27,29 @@ struct ConsoleLogger : Logger{
 
 struct AccountDatabase {
     virtual ~AccountDatabase() = default;
-    virtual double get_balance(long account_id) = 0;
-    virtual void set_balance(long account_id, double amount) = 0;
+    virtual const double get_balance(const long account_id) = 0;
+    virtual const void set_balance(const long account_id, double amount) = 0;
 };
 
 struct InMemoryAccountDatabase : AccountDatabase {
-    // TODO: needs a dtor?
     std::unordered_map<long, double> balances;
 
-    double get_balance(long account_id) override {
+    const double get_balance(const long account_id) override {
         return balances[account_id];
     }
 
-    void set_balance(long account_id, double amount) override {
+    const void set_balance(const long account_id, const double amount) override {
         balances[account_id] = amount;
     }
 };
 
 struct Bank {
     Bank(Logger* logger, AccountDatabase& account_db) : logger{ logger }, account_db{ account_db } {}
-    void set_logger(Logger* new_logger) {
+    const void set_logger(Logger* new_logger) {
         logger = new_logger;
     }
-    void make_transfer(long from, long to, double amount) {
-        account_db.set_balance(from ,account_db.get_balance(from) - amount);
+    const void make_transfer(const long from, const long to, const double amount) {
+        account_db.set_balance(from, account_db.get_balance(from) - amount);
         account_db.set_balance(to, account_db.get_balance(to) + amount);
         if (logger) logger->log_transfer(from, to, amount);
     }
@@ -66,4 +64,6 @@ int main() {
 
     auto bank{Bank(&logger, account_db)};
     bank.make_transfer(21L, 55L, 66.6);
+
+    printf("%f", account_db.get_balance(21L));
 }
