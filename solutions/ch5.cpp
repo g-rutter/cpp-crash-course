@@ -62,11 +62,8 @@ struct Bank {
 
 int main() {
     auto logger{ConsoleLogger("hello")};
-
-    // TODO Why can't I can't simply make the first line a reference?
     auto account_db{InMemoryAccountDatabase()};
-    auto& account_db_ref{account_db};
 
-    auto bank{Bank(&logger, account_db_ref)};
+    auto bank{Bank(&logger, account_db)};
     bank.make_transfer(21L, 55L, 66.6);
 }
