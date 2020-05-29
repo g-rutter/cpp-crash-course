@@ -13,8 +13,8 @@ struct TimerClass {
 
     TimerClass (const TimerClass& other): timestamp{other.timestamp}, name{other.name}{}
     TimerClass& operator=(const TimerClass& other) {
-        this->timestamp = other.timestamp;
-        this->name = other.name;
+        timestamp = other.timestamp;
+        name = other.name;
         return *this;
     }
 
@@ -22,9 +22,9 @@ struct TimerClass {
         other.moved_from = true;
     }
     TimerClass& operator=(TimerClass&& other) noexcept {
+        timestamp = other.timestamp;
+        name = other.name;
         other.moved_from = true;
-        this->timestamp = other.timestamp;
-        this->name = other.name;
         return *this;
     }
 
@@ -49,6 +49,6 @@ int main() {
     TimerClass timerclass_move_cons{std::move(timerclass)};
 
     TimerClass timerclass_move_assign{"move_assign"};
-    timerclass_move_assign = std::move(timerclass);
+    timerclass_move_assign = std::move(timerclass_move_cons);
     printf("Yowwww\n");
 }
