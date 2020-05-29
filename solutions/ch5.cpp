@@ -33,6 +33,7 @@ struct AccountDatabase {
 };
 
 struct InMemoryAccountDatabase : AccountDatabase {
+    // TODO: needs a dtor?
     std::unordered_map<long, double> balances;
 
     double get_balance(long account_id) override {
