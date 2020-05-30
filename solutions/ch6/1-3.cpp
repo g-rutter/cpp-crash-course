@@ -18,7 +18,7 @@ T mode(const T* values, const size_t length) {
     int count_max = 0;
     T arg_max = 0;
 
-    for (std::pair<T, int> pair : value_counts){
+    for (const std::pair<T, int>& pair : value_counts){ //Could use std::max_element
         if (pair.second > count_max) {
             count_max = pair.second;
             arg_max = pair.first;
