@@ -5,21 +5,12 @@
 // 6-2. Implement mode as a template function.
 // 6-3. Modify mode to accept an Integer concept. Verify that mode fails to
 //      instantiate with floating types like double.
-// 6-4. Refactor mean in Listing 6-13 to accept an array rather than pointer and
-//      length arguments. Use Listing 6-33 as a guide.
-// 6-5. Using the example from Chapter 5, make Bank a template class that accepts a template parameter.
-//      Use this type parameter as the type of an account rather than long.
-//      Verify that your code still works using a Bank<long> class.
-// 6-6. Implement an Account class and instantiate a Bank<Account>. Implement functions in Account to keep track of balances.
-// 6-7. Make Account an interface. Implement a CheckingAccount and SavingsAccount.
-//      Create a program with several checking and savings accounts.
-//      Use a Bank<Account> to make several transactions between the accounts.
 #include <cstdio>
 #include <unordered_map>
 #include <type_traits>
 
 template<typename T>
-T mode(const T* values, size_t length){
+T mode(const T* values, const size_t length) {
     static_assert(std::is_integral<T>::value, "Pointer values must be integral type.");
     std::unordered_map<T, int> value_counts;
     for (size_t i = 0; i < length; i++) value_counts[values[i]]++;

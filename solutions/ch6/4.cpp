@@ -5,10 +5,10 @@
 #include <cstdio>
 
 template<typename T, size_t Length>
-T& mean(T (&arr)[Length]) {
+T mean(const T (&arr)[Length]) {
     T result{};
-    for(size_t i{}; i<Length; i++) result_mod += arr[i];
-    return result_mod / Length;
+    for(size_t i{}; i<Length; i++) result += arr[i];
+    return result / Length;
 }
 
 int main() {
