@@ -30,7 +30,7 @@ T mode(const T* values, const size_t length) {
 
 int main() {
     const int values[] = {1, 0, 2, 2};
-    auto mode_ = mode(values, sizeof(values) / sizeof(values[0]));
+    const auto mode_ = mode(values, sizeof(values) / sizeof(values[0]));
     printf("%d", mode_);
     return 0;
 }
