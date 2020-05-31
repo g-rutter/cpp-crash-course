@@ -32,14 +32,12 @@ struct UnsignedBigInteger {
     }
 
     template<typename Integer>
-    operator Integer() const {
+    explicit operator Integer() const {
         static_assert(std::is_integral<Integer>::value, "Can't cast UnsignedBigInteger to non-integer type.");
         Integer rtn{};
-        for (size_t i = size; i > 0; i--) {
-            int exponent = size - i - 2;
-            rtn += bits[i-1] * (2 ^ exponent);
-        }
+        for (size_t i = size; i > 0; i--) rtn += bits[i-1] << (size - i);
         // TODO test overflow
+        return rtn;
     }
 
     UnsignedBigInteger operator+(const UnsignedBigInteger& other) const {
@@ -62,4 +60,7 @@ int main() {
     big_int.printf_binary(); // 0010100
     UnsignedBigInteger big_int2(big_int + big_int);
     big_int2.printf_binary(); // 0101000
+
+    auto normal_int{static_cast<int>(big_int2)};
+    printf("%d\n", normal_int); // 40
 }
