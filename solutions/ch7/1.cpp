@@ -5,52 +5,61 @@
 //      operator overloads work for both int types and UnsignedBigInteger types. Implement an
 //      operator int type conversion. Perform a runtime check if narrowing would occur.
 #include <cstdio>
+#include <iostream>
 #include <stddef.h>
+#include <stdexcept>
+#include <type_traits>
 
 template<int size>
 struct UnsignedBigInteger {
-    UnsignedBigInteger(const bool bits[size]) : bits{bits} {};
+    UnsignedBigInteger(const bool bits_input[size]) {
+        for (size_t i = 0; i < size; i++) bits[i] = bits_input[i];
+    };
     UnsignedBigInteger() : bits{0} {};
 
-    void printf_binary() {
+    UnsignedBigInteger(int value) {
+        // TODO case of negative/signed number
+        for (size_t i = size; i > 0; i--) {
+            bits[i-1] = value % 2;
+            value /= 2;
+        }
+        if (value > 0) throw std::overflow_error("Input too large to represent as UnsignedBigInteger");
+    };
+
+    void printf_binary() const {
         for (size_t i = 0; i < size; i++) printf("%d", bits[i]);
         printf("\n");
     }
 
-    UnsignedBigInteger operator+(const UnsignedBigInteger other) const {
+    template<typename Integer>
+    operator Integer() const {
+        static_assert(std::is_integral<Integer>::value, "Can't cast UnsignedBigInteger to non-integer type.");
+        Integer rtn{};
+        for (size_t i = size; i > 0; i--) {
+            int exponent = size - i - 2;
+            rtn += bits[i-1] * (2 ^ exponent);
+        }
+        // TODO test overflow
+    }
+
+    UnsignedBigInteger operator+(const UnsignedBigInteger& other) const {
         bool carry{false};
         bool new_bits[size]{};
-        for (size_t i = size - 1; i > 0; i--) {
-            unsigned short total = bits[i] + other.bits[i] + carry;
-            switch (total) {
-                case 3:
-                    new_bits[i] = true;
-                    carry = true;
-                    break;
-                case 2:
-                    new_bits[i] = false;
-                    carry = true;
-                    break;
-                case 1:
-                    new_bits[i] = true;
-                    carry = false;
-                    break;
-                case 0:
-                    new_bits[0] = false;
-                    carry = false;
-                    break;
-            }
+        for (size_t i = size; i > 0; i--) {
+            unsigned short total = bits[i-1] + other.bits[i-1] + carry;
+            carry = total > 1;
+            new_bits[i-1] = total % 2;;
         }
+        if(carry) throw std::overflow_error("Max size of UnsignedBigInteger reached during addition.");
         return UnsignedBigInteger{new_bits};
-
     }
 
     bool bits[size];
 };
 
 int main() {
-    UnsignedBigInteger<100> big_int{};
-    big_int.printf_binary();
+    UnsignedBigInteger<7> big_int{20};
+    big_int.printf_binary(); // 0010100
     UnsignedBigInteger big_int2(big_int + big_int);
-    big_int.printf_binary();
+    big_int2.printf_binary(); // 0101000
 }
