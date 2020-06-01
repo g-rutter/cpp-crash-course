@@ -11,21 +11,17 @@ int PrimeNumberIterator::operator*(){
     return current;
 }
 PrimeNumberIterator& PrimeNumberIterator::operator++() {
-    bool is_prime{true};
+    bool found_prime{false};
     double int_div;
     double double_div;
-    while (true) {
-        is_prime = true;
+    while (!found_prime) {
         current++;
         for(int i=2; i < current; i++) {
             int_div = double(current / i);
             double_div = double(current)/double(i);
-            if(int_div == double_div){
-                is_prime = false;
-                break;
-            }
+            if(int_div == double_div) break; // Found a divisor; give up on this candidate early
+            if(i + 1 == current) found_prime = true;
         }
-        if(is_prime) break;
     }
     return *this;
 }
