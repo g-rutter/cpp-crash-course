@@ -1,5 +1,6 @@
-# Executables
-a.out
+# Compilation
+*.out
+*.dSYM
 
 # VSCode stuff
 vscode.code-workspace
