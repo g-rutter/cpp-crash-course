@@ -62,7 +62,7 @@ struct UnsignedBigInteger {
             carry = total < 0;
             new_bits[i-1] = total % 2;
         }
-        if(carry) throw std::overflow_error("Max size of UnsignedBigInteger reached during addition.");
+        if(carry) throw std::underflow_error("Min size of UnsignedBigInteger reached during addition.");
         return UnsignedBigInteger{new_bits};
     }
 
