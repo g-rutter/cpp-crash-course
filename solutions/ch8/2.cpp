@@ -17,7 +17,7 @@ PrimeNumberIterator& PrimeNumberIterator::operator++() {
     while (true) {
         is_prime = true;
         current++;
-        for(const int i=2; i < current; i++) {
+        for(int i=2; i < current; i++) {
             int_div = double(current / i);
             double_div = double(current)/double(i);
             if(int_div == double_div){
