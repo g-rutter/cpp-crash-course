@@ -1,12 +1,12 @@
 // (Soon-to-be) working version of the chapter 10 code.
 // The code is finalised in listing 10-55 but includes snippets throughout the chapter,
 // so this is provided for reference.
-// Users header libraries catch and hippomocks.
+// Uses header libraries catch and hippomocks.
 #define CATCH_CONFIG_MAIN
 #include "hippomocks.h"
 #include "catch.hpp"
 #include <functional>
-
+#include <exception>
 
 struct SpeedUpdate {
     double velocity_mps;
@@ -15,7 +15,7 @@ struct CarDetected {
     double distance_m;
     double velocity_mps;
 };
-    struct BrakeCommand {
+struct BrakeCommand {
     double time_to_collision_s;
 };
 
@@ -31,10 +31,14 @@ struct IServiceBus {
 
 template <typename T>
 struct AutoBrake {
-        AutoBrake(const T& publishu) : publish{ publish } { }
-        void observe(const SpeedUpdate& cd) { }
-        void observe(const CarDetected& cd) { }
-        void set_collision_threshold_s(double x) {
+    AutoBrake(const T& publish) : publish{ publish } { }
+    void observe(const SpeedUpdate& x) { 
+        speed_mps = x.velocity_mps;
+    }
+    void observe(const CarDetected& x) { }
+
+    void set_collision_threshold_s(double x) {
+        if (x < 1) throw std::exception();
         collision_threshold_s = x;
     }
     double get_collision_threshold_s() const {
@@ -45,8 +49,8 @@ struct AutoBrake {
     }
 
     private:
-        double collision_threshold_s;
-        double speed_mps;
+        double collision_threshold_s{5.0};
+        double speed_mps{0.0};
         const T& publish;
 };
 
@@ -97,10 +101,12 @@ TEST_CASE("AutoBrake") {
         mocks.ExpectCall(bus, IServiceBus::publish)
             .Match([](const auto& cmd) {
                 return cmd.time_to_collision_s == Approx(1);
-    });
+        });
+    }
     
     auto_brake.set_collision_threshold_s(10L);
-    speed_update_callback(SpeedUpdate{ 100L });
-    car_detected_callback(CarDetected{ 100L, 0L });
-  }
+    speed_update_callback(SpeedUpdate{ 100L }); // BAD: That won't work because is an uninitalised function
+    car_detected_callback(CarDetected{ 100L, 0L }); // BAD: That won't work because is an uninitalised function
+    //However, lines like 'bus->subscribe_to_speed(speed_update_callback);' would satisfy the expected call.
+    //BUT we need a way to pass in updates.
 }
