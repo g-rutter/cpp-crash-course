@@ -4,12 +4,12 @@
 #include <iterator>
 #include <vector>
 
-template <typename A>
-using InputIterator = typename std::vector<A>::iterator;
+template<typename InputIterator>
+using IteratorRtn = typename std::iterator_traits<InputIterator>::value_type;
 
-template<typename A>
-A range_sum(InputIterator<A> itr1, InputIterator<A> itr2) {
-    A result = 0;
+template<typename InputIterator>
+IteratorRtn<InputIterator> range_sum(InputIterator itr1, InputIterator itr2){
+    IteratorRtn<InputIterator> result = 0;
     do {
         result += *itr1++;
     } while (itr1 != itr2);
@@ -17,7 +17,7 @@ A range_sum(InputIterator<A> itr1, InputIterator<A> itr2) {
 }
 
 int main () {
-    std::vector<int> stuff{1,1,2,2,3,3};
-    int result = range_sum<int>(stuff.begin(), stuff.end());
+    std::vector<int> stuff{1,-1,2,2,-3,-3};
+    int result = range_sum(stuff.begin(), stuff.end());
     printf("Result: %d\n", result);
 }
