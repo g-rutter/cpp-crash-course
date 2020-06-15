@@ -1,7 +1,7 @@
 // Starting point.
 // https://raw.githubusercontent.com/JLospinoso/ccc/master/chapter_10/catch/tests.cpp
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include "../support/catch.hpp"
 #include <functional>
 #include <stdexcept>
 

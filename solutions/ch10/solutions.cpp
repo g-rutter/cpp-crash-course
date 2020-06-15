@@ -25,7 +25,7 @@
 //        second. Ensure that exactly one BrakeCommand is issued. The time_to_collision_s field should equal 0.
 // 10-12. Make all unit tests pass
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include "../support/catch.hpp"
 #include <functional>
 #include <stdexcept>
 
