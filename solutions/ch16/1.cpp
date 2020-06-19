@@ -2,10 +2,6 @@
 // 16-1. Implement an output operator that prints information about the AutoBrake from
 //       “An Extended Example: Taking a Brake” on page 283. Include the vehicle’s 
 //       current collision threshold and speed.
-// 16-3. Read the introductory documentation for Boost IOStream.
-// 16-4. Write a program that accepts a file path, opens the file, and prints summary
-//       information about the contents, including word count, average word length,
-//       and a histogram of the characters.
 #include <iostream>
 
 struct AutoBrake {
