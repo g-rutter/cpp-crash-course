@@ -10,7 +10,7 @@
 #include <queue>
 #include <mutex>
 #include <iostream>
-
+#include <future>
 
 template<typename A>
 struct SafeQueue {
@@ -40,17 +40,19 @@ struct SafeQueue {
     void push(B&& value){
         std::lock_guard<std::mutex> lock(mutex);
         queue.push(std::forward<B>(value));
+        cv.notify_one();
     }
 
     template< typename... Args >
     decltype(auto) emplace( Args&&... args ){
         std::lock_guard<std::mutex> lock(mutex);
         queue.emplace(std::forward<Args>(args)...);
+        cv.notify_one();
     }
 
     void pop(){
         std::lock_guard<std::mutex> lock(mutex);
-        queue.pop();
+        return queue.pop();
     }
 
     void swap( SafeQueue& other ) noexcept {
@@ -58,16 +60,40 @@ struct SafeQueue {
         std::swap(queue, other.queue);
     }
 
+    A wait_and_pop() {
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            if(!queue.empty()) {
+                A rtn = queue.back();
+                queue.pop();
+                return rtn;
+            }
+        }
+
+        std::unique_lock<std::mutex> lk(mutex);
+        cv.wait(lk, [&]{return !queue.empty();});
+        A rtn = queue.back();
+        queue.pop();
+        lk.unlock();
+        return rtn;
+    }
+
     private:
         std::queue<A> queue{};
         std::mutex mutex{};
+        std::condition_variable cv{};
 };
 
 int main() {
     SafeQueue<int> my_queue;
 
-    int myint{2};
+    auto get_last_value = std::async(std::launch::async, [&] { return my_queue.wait_and_pop(); });
+
+    int myint{27};
     my_queue.push(1);
     my_queue.push(myint);
+    my_queue.emplace(myint);
+    int last_value = get_last_value.get();
     std::cout << "Number of elements: " << my_queue.size() << std::endl;
+    std::cout << "Last value: " << last_value << std::endl;
 }
