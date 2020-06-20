@@ -16,22 +16,22 @@ template<typename A>
 struct SafeQueue {
     SafeQueue() {};
 
-    A front() {
+    A front() const {
         std::lock_guard<std::mutex> lock(mutex);
         return queue.front();
     }
 
-    A back() {
+    A back() const {
         std::lock_guard<std::mutex> lock(mutex);
         return queue.back();
     }
 
-    bool empty() {
+    bool empty() const {
         std::lock_guard<std::mutex> lock(mutex);
         return queue.empty();
     }
 
-    size_t size() {
+    size_t size() const {
         std::lock_guard<std::mutex> lock(mutex);
         return queue.size();
     }
@@ -72,7 +72,7 @@ struct SafeQueue {
 
         std::unique_lock<std::mutex> lk(mutex);
         cv.wait(lk, [&]{return !queue.empty();});
-        A rtn = queue.back();
+        const A rtn = queue.back();
         queue.pop();
         lk.unlock();
         return rtn;
@@ -80,7 +80,7 @@ struct SafeQueue {
 
     private:
         std::queue<A> queue{};
-        std::mutex mutex{};
+        mutable std::mutex mutex{};
         std::condition_variable cv{};
 };
 
@@ -89,11 +89,11 @@ int main() {
 
     auto get_last_value = std::async(std::launch::async, [&] { return my_queue.wait_and_pop(); });
 
-    int myint{27};
+    const int myint{27};
     my_queue.push(1);
     my_queue.push(myint);
     my_queue.emplace(myint);
-    int last_value = get_last_value.get();
+    const int last_value = get_last_value.get();
     std::cout << "Number of elements: " << my_queue.size() << std::endl;
     std::cout << "Last value: " << last_value << std::endl;
 }
